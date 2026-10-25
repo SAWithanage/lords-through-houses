@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lords through Houses Predictions</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Container for side-by-side layout and centering */
+        #controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap; /* Allows stacking on very small screens */
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        select {
+            padding: 8px 12px;
+            min-width: 150px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4a6fa5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 18px; /* Aligns button with bottom of inputs */
+        }
+
+        button:hover {
+            background-color: #3b5998;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid #eee;
+            margin: 30px auto;
+            max-width: 900px;
+        }
+
+        /* Display Area Styling */
+        #prediction-display {
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 100px;
+        }
+
+        #prediction-heading {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        #prediction-interpretation {
+            font-size: 1.1em;
+            line-height: 1.6;
+            white-space: pre-wrap; /* Preserves formatting from DB */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Lords through Houses</h1>
+
+    <!-- Selection Controls -->
+    <div id="controls">
+        <div class="control-group">
+            <label for="lord">Lord:</label>
+            <select id="lord">
+                <option value="">-- Select --</option>
+                <option value="1">1st Lord</option>
+                <option value="2">2nd Lord</option>
+                <option value="3">3rd Lord</option>
+                <option value="4">4th Lord</option>
+                <option value="5">5th Lord</option>
+                <option value="6">6th Lord</option>
+                <option value="7">7th Lord</option>
+                <option value="8">8th Lord</option>
+                <option value="9">9th Lord</option>
+                <option value="10">10th Lord</option>
+                <option value="11">11th Lord</option>
+                <option value="12">12th Lord</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label for="wshHouse">WSH House:</label>
+            <select id="wshHouse">
+                <option value="">-- Select --</option>
+                <option value="1">1st House</option>
+                <option value="2">2nd House</option>
+                <option value="3">3rd House</option>
+                <option value="4">4th House</option>
+                <option value="5">5th House</option>
+                <option value="6">6th House</option>
+                <option value="7">7th House</option>
+                <option value="8">8th House</option>
+                <option value="9">9th House</option>
+                <option value="10">10th House</option>
+                <option value="11">11th House</option>
+                <option value="12">12th House</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label for="bchHouse">BCH House:</label>
+            <select id="bchHouse">
+                <option value="">-- Select --</option>
+                <option value="1">1st House</option>
+                <option value="2">2nd House</option>
+                <option value="3">3rd House</option>
+                <option value="4">4th House</option>
+                <option value="5">5th House</option>
+                <option value="6">6th House</option>
+                <option value="7">7th House</option>
+                <option value="8">8th House</option>
+                <option value="9">9th House</option>
+                <option value="10">10th House</option>
+                <option value="11">11th House</option>
+                <option value="12">12th House</option>
+            </select>
+        </div>
+
+        <button id="getPredictionBtn">Get Prediction</button>
+    </div>
+
+    <hr>
+
+    <!-- Display Area -->
+    <div id="prediction-display">
+        <div id="prediction-heading"></div>
+        <div id="prediction-interpretation"></div>
+    </div>
+
+    <!-- Load the generated database file -->
+    <script src="lords_database.js"></script>
+
+    <!-- Frontend Logic -->
+    <script>
+        document.getElementById('getPredictionBtn').addEventListener('click', function() {
+            const lord = document.getElementById('lord').value;
+            const wshHouse = document.getElementById('wshHouse').value;
+            const bchHouse = document.getElementById('bchHouse').value;
+            
+            const headingEl = document.getElementById('prediction-heading');
+            const interpretationEl = document.getElementById('prediction-interpretation');
+
+            // Clear previous results
+            headingEl.innerText = '';
+            interpretationEl.innerText = '';
+
+            if (!lord || !wshHouse || !bchHouse) {
+                headingEl.innerText = 'Please select all three options.';
+                return;
+            }
+
+            // Ensure database is loaded
+            if (typeof lordsDatabase === 'undefined') {
+                headingEl.innerText = 'Error: Database not loaded.';
+                return;
+            }
+
+            // Search the global lordsDatabase variable
+            const result = lordsDatabase.find(entry => 
+                entry.lord === parseInt(lord) && 
+                entry.wshHouse === parseInt(wshHouse) && 
+                entry.bchHouse === parseInt(bchHouse)
+            );
+
+            if (result) {
+                headingEl.innerText = result.heading;
+                interpretationEl.innerText = result.interpretation;
+            } else {
+                headingEl.innerText = 'No prediction found for this combination.';
+            }
+        });
+    </script>
+
+</body>
+</html>
